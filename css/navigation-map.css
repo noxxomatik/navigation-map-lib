@@ -1,0 +1,22 @@
+div.container {
+    width: 100%;
+}
+div.menu {
+    float: left;
+    max-width: 160px;
+    margin: 0;
+    padding: 1em;
+}
+div.renderer {
+    margin-left: 170px;
+    border:2px solid gray;
+    overflow: hidden;
+}
+.menu-item {
+    margin: 5px 0px;
+    float: left;
+}
+#values {
+    font-family: sans-serif;
+    font-size: smaller;
+}
