@@ -92,5 +92,7 @@ function nextTrackingStep() {
     $("#gravy").html(navdata.gravy);
     $("#gravz").html(navdata.gravz);
     $("#timestamp").html(new Date(navdata.timestamp));
+
+    navMapVis.addROVPose();
 }
 
