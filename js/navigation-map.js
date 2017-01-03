@@ -1,7 +1,12 @@
 /**
  * Created by Sven Otte on 02.01.2017.
  */
+var jsonLoader;
+var navMapVis;
+
 $(document).ready(function () {
+    jsonLoader = new JSONLoader();
+
     $("#file-input").css("display", "none");
     $("#file-options").css("display", "none");
     $("#next-step-tracking").css("display", "none");
@@ -21,7 +26,7 @@ $(document).ready(function () {
     });
 
     $("#file-input").change(function () {
-        loadJSON($("#file-input").prop("files")[0]);
+        jsonLoader.loadJSON($("#file-input").prop("files")[0]);
     });
     
     $("#start-tracking").click(function () {
@@ -30,9 +35,6 @@ $(document).ready(function () {
         $("#start-tracking").click(startTracking());
 
         $("#next-step-tracking").prop("disabled", false);
-
-        init(".renderer");
-        //animate();
     });
 
     $("#next-step-tracking").click(function () {
@@ -48,8 +50,9 @@ function startTracking () {
 
     $("#next-step-tracking").prop("disabled", false);
 
-    init(".renderer");
-    //animate();
+    navMapVis = new NavMapVis();
+    navMapVis.init(".renderer");
+    navMapVis.animate();
 }
 
 function stopTracking () {
@@ -65,7 +68,7 @@ function stopTracking () {
 }
 
 function nextTrackingStep() {
-    var navdata = getNextDataSet();
+    navdata = jsonLoader.getNextDataSet();
 
     $("#roll").html(navdata.roll);
     $("#pitch").html(navdata.pitch);

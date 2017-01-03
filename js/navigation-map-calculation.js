@@ -1,8 +1,6 @@
 /**
  * Created by Sven Otte on 02.01.2017.
  */
-var data;
-var pose = new Pose(0, 0, 0, 0, 0, 0);
 
 // calculated pose of the ROV
 function Pose(x, y, z, roll, pitch, yaw) {
@@ -40,19 +38,24 @@ function Navdata(roll, pitch, yaw, thrust, depth, heading, acclx, accly, acclz, 
     this.timestamp = timestamp
 }
 
-// calculate the next pose
-function calculateNextPose(navdata, filter) {
-    data = navdata;
+function NavMapCalc() {
+    this.data;
+    this.pose = new Pose(0, 0, 0, 0, 0, 0);
 
-    pose.x = 0;
-    pose.y = 0;
-    pose.z = 0;
-    pose.roll = navdata.roll;
-    pose.pitch = navdata.pitch;
-    pose.yaw = navdata.yaw;
-}
+    // calculate the next pose
+    this.calculateNextPose = function(navdata, filter) {
+        this.data = navdata;
 
-// returns pose of the ROV
-function getNextPose() {
-    return pose;
+        this.pose.x = 0;
+        this.pose.y = 0;
+        this.pose.z = 0;
+        this.pose.roll = navdata.roll;
+        this.pose.pitch = navdata.pitch;
+        this.pose.yaw = navdata.yaw;
+    }
+
+    // returns pose of the ROV
+    this.getNextPose = function() {
+        return this.pose;
+    }
 }
