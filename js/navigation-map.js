@@ -3,6 +3,7 @@
  */
 var jsonLoader;
 var navMapVis;
+var navMapCalc;
 
 $(document).ready(function () {
     jsonLoader = new JSONLoader();
@@ -40,6 +41,22 @@ $(document).ready(function () {
     $("#next-step-tracking").click(function () {
        nextTrackingStep();
     });
+
+    // stats
+    /*var stats = new Stats();
+    stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild( stats.dom );
+    function animate() {
+        stats.begin();
+        // monitored code goes here
+        stats.end();
+        requestAnimationFrame( animate );
+    }
+    requestAnimationFrame( animate )*/
+
+    // zoom
+    document.getElementById("renderer").addEventListener("mousewheel", zoomRenderer, false);
+    document.getElementById("renderer").addEventListener("DOMMouseScroll", zoomRenderer, false);
 });
 
 function startTracking () {
@@ -51,7 +68,8 @@ function startTracking () {
     $("#next-step-tracking").prop("disabled", false);
 
     navMapVis = new NavMapVis();
-    navMapVis.init(".renderer");
+    navMapCalc = new NavMapCalc();
+    navMapVis.init("#renderer");
     navMapVis.animate();
 }
 
@@ -60,7 +78,7 @@ function stopTracking () {
 
     $("#next-step-tracking").prop("disabled", true);
 
-    $(".renderer").empty();
+    $("#renderer").empty();
 
     $("#start-tracking").click(function () {
         startTracking();
@@ -93,6 +111,17 @@ function nextTrackingStep() {
     $("#gravz").html(navdata.gravz);
     $("#timestamp").html(new Date(navdata.timestamp));
 
-    navMapVis.addROVPose();
+    navMapVis.addROVPose(navMapCalc.calculateNextPose(navdata));
+}
+
+function zoomRenderer(e) {
+    var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+    if (delta > 0) {
+        navMapVis.zoomIn();
+    }
+    else {
+        navMapVis.zoomOut();
+    }
+    return false;
 }
 

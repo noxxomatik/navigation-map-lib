@@ -15,7 +15,7 @@ div.menu {
     margin: 0;
     padding: 1em;
 }
-div.renderer {
+#renderer {
     margin-left: 170px;
     border:2px solid gray;
     overflow: hidden;
