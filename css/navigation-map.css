@@ -26,6 +26,7 @@ div.menu {
 .menu-item {
     margin: 5px 0px;
     float: left;
+    width: 160px;
 }
 #values {
     font-family: sans-serif;

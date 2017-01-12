@@ -5,6 +5,7 @@ var jsonLoader;
 var navMapVis;
 var navMapCalc;
 var intervalId;
+var realtimeTracking = true;
 
 $(document).ready(function () {
     jsonLoader = new JSONLoader();
@@ -19,11 +20,13 @@ $(document).ready(function () {
             $("#file-input").css("display", "block");
             $("#file-options").css("display", "block");
             $("#next-step-tracking").css("display", "block");
+            realtimeTracking = false;
         }
         else {
             $("#file-input").css("display", "none");
             $("#file-options").css("display", "none");
             $("#next-step-tracking").css("display", "none");
+            realtimeTracking = true;
         }
     });
 
@@ -73,7 +76,51 @@ function startTracking () {
     navMapVis.init("#renderer");
     navMapVis.animate();
 
-    intervalId = setInterval(nextTrackingStep, 100);
+    if (realtimeTracking) {
+        var navdata = new Navdata(0, 0, 0, 0, 0, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0, Date.now());
+        window.addEventListener("deviceorientation", function (event) {
+            console.log("deviceoriantation changed " + event);
+            navdata.heading = event.alpha;
+            navdata.yaw = event.alpha;
+            navdata.pitch = event.beta;
+            navdata.roll = event.gamma;
+        });
+        window.addEventListener("devicemotion", function(event){
+            console.log("devicemotion changed " + event);
+            navdata.lacclx = event.acceleration.x;
+            navdata.laccly = event.acceleration.y;
+            navdata.lacclz = event.acceleration.z;
+            navdata.timestamp = Date.now();
+
+            $("#roll").html(navdata.roll);
+            $("#pitch").html(navdata.pitch);
+            $("#yaw").html(navdata.yaw);
+            $("#thrust").html(navdata.thrust);
+            $("#depth").html(navdata.depth);
+            $("#heading").html(navdata.heading);
+            $("#acclx").html(navdata.acclx);
+            $("#accly").html(navdata.accly);
+            $("#acclz").html(navdata.acclz);
+            $("#magx").html(navdata.magx);
+            $("#magy").html(navdata.magy);
+            $("#magz").html(navdata.magz);
+            $("#gyrox").html(navdata.gyrox);
+            $("#gyroy").html(navdata.gyroy);
+            $("#gyroz").html(navdata.gyroz);
+            $("#lacclx").html(navdata.lacclx);
+            $("#laccly").html(navdata.laccly);
+            $("#lacclz").html(navdata.lacclz);
+            $("#gravx").html(navdata.gravx);
+            $("#gravy").html(navdata.gravy);
+            $("#gravz").html(navdata.gravz);
+            $("#timestamp").html(new Date(navdata.timestamp));
+
+            navMapVis.addROVPose(navMapCalc.calculateNextPose(navdata));
+        }, true);
+    }
+    else {
+        intervalId = setInterval(nextTrackingStep, 100);
+    }
 }
 
 function stopTracking () {

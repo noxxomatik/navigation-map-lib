@@ -78,9 +78,9 @@ function NavMapCalc() {
     // calculate the next pose
     this.calculateNextPose = function(navdata, filter) {
         /* mock values */
-        navdata.lacclx = 1;
-        navdata.laccly = 0;
-        navdata.lacclz = 0;
+        //navdata.lacclx = 1;
+        //navdata.laccly = 0;
+        //navdata.lacclz = 0;
 
         var newPose = new Pose();
 
