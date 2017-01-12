@@ -9,18 +9,15 @@ function NavMapVis() {
     var buoyHistory = [];
     var zoom = 1;
 
-    // ROV size in meters
-    var rovLength = 2;
-    var rovWidth = 1;
-
     // ROV representation
     var rovMesh;
+    var rovObject;
 
     this.init = function(rendererSelector) {
         // scene dimensions
-        width = $(rendererSelector).width();
-        height = $(rendererSelector).height();
-        dim = width < height ? width : height;
+        var width = $(rendererSelector).width();
+        var height = $(rendererSelector).height();
+        //dim = width < height ? width : height;
 
         // scene
         scene = new THREE.Scene();
@@ -29,58 +26,76 @@ function NavMapVis() {
         this.createROV();
 
         // camera
-        camera = new THREE.PerspectiveCamera(75, 1.0, 1, 10000);
-        camera.position.y = -50;
+        camera = new THREE.PerspectiveCamera(75, width / height, 1, 10000);
         camera.position.z = 50;
-        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        camera.position.x = -50;
+        camera.rotation.z = - 1 / 2 * Math.PI;
+        camera.rotation.y =  - 1 / 4 * Math.PI;
+        //camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+        // light
+        var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+        directionalLight.position.set( 0, 1, 1 );
+        scene.add( directionalLight );
+
+        var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+        scene.add( light );
+
+        // grid
+        var size = 50;
+        var divisions = 100;
+        var colorCenterLine = new THREE.Color(1, 0, 0);
+        var colorGrid = new THREE.Color(0, 0, 0);
+        var gridHelper = new THREE.GridHelper( size, divisions, colorCenterLine, colorGrid);
+        gridHelper.rotation.x = 1 / 2 * Math.PI;
+        scene.add( gridHelper );
 
         // compilation
         renderer = new THREE.WebGLRenderer();
-        renderer.setSize(dim, dim);
+        renderer.setSize(width, height);
 
         // append renderer
         $(rendererSelector).append(renderer.domElement);
     };
 
     this.animate = function() {
-
-        //requestAnimationFrame( animate );
-
-        //mesh.rotation.x += 0.01;
-        //mesh.rotation.y += 0.02;
         renderer.render(scene, camera);
-
     };
 
     // adds the current ROV pose to the scene
     this.addROVPose = function(pose) {
-        // create a ghost pose of the old pose and add it to the history
-        if (poseHistory.length > 0) {
-            var ghostPose = poseHistory[poseHistory.length - 1];
-            this.createGhostROV(ghostPose);
-
-            // draw a line to new pose
-            var lineMaterial = new THREE.LineBasicMaterial({color: 0xffff00});
-            var lineGeometry = new THREE.Geometry();
-            lineGeometry.vertices.push(new THREE.Vector3(ghostPose.x, ghostPose.y, ghostPose.z));
-            lineGeometry.vertices.push(new THREE.Vector3(pose.x, pose.y, pose.z));
-            var line = new THREE.Line(lineGeometry, lineMaterial);
-            scene.add(line);
+        // initialize the ROV object at the center
+        if (poseHistory.length < 1) {
+            // set the ROV to the initial depth
+            rovObject.matrix.setPosition(new THREE.Vector3(0, 0, -(pose.depth)));
+            scene.add(rovObject);
         }
-        // add the ROV mesh
-        else {
-            scene.add(rovMesh);
-        }
-
-        poseHistory.push(new Pose(pose.x, pose.y, pose.z, pose.roll, pose.pitch, pose.yaw));
 
         // set rov to the new pose
-        rovMesh.matrix.setPosition(new THREE.Vector3(pose.x, pose.y, pose.z));
-        rovMesh.setRotationFromEuler(new THREE.Euler(pose.roll, pose.pitch, pose.yaw, "XYZ"));
-        rovMesh.matrixAutoUpdate = false;
+        rovObject.setRotationFromEuler(new THREE.Euler(pose.roll, pose.pitch, pose.yaw, "XYZ"));
+        rovObject.translateX(pose.transX);
+        rovObject.translateY(pose.transY);
+        rovObject.translateZ(pose.transZ);
+        //rovObject.matrixAutoUpdate = false;
 
-        // set camaera to follow the ROV
-        //camera.lookAt(rovMesh);
+        // save new position to history
+        var position = rovObject.getWorldPosition();
+        var savePose = new Pose();
+        savePose.x = position.x;
+        savePose.y = position.y;
+        savePose.z = position.z;
+        savePose.roll = pose.roll;
+        savePose.pitch = pose.pitch;
+        savePose.yaw = pose.yaw;
+        poseHistory.push(savePose);
+
+        // create a ghost pose of the last pose
+        if (poseHistory.length > 1) {
+            var ghostPose = poseHistory[poseHistory.length - 2];
+            this.createGhostROV(ghostPose);
+            // draw a line to new pose
+            this.drawConnection(ghostPose, savePose);
+        }
 
         renderer.render(scene, camera);
     };
@@ -91,27 +106,43 @@ function NavMapVis() {
         var waterMaterial = new THREE.MeshBasicMaterial({
             color: 0x0000ff, side: THREE.DoubleSide, transparent: true, opacity: 0.2});
         var water = new THREE.Mesh(waterGeometry, waterMaterial);
+        water.castShadow = false;
         scene.add(water);
     };
 
     // create the ROV representation
     this.createROV = function() {
-        var geometry = new THREE.ConeGeometry(rovWidth, rovLength, 10);
-        var material = new THREE.MeshBasicMaterial({color: 0xff0000});
-        rovMesh = new THREE.Mesh(geometry, material);
+        var loader = new THREE.OBJLoader();
+        loader.load("models/rov.obj", function(object){
+            object.children[0].material = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
+            object.castShadow = false;
+            rovMesh = object.children[0];
+            rovObject = object;
+        });
     };
 
     // create a ghost ROV pose
     this.createGhostROV = function(pose) {
-        var ghostGeometry = new THREE.ConeGeometry(rovWidth, rovLength, 10);
-        var ghostMaterial = new THREE.MeshBasicMaterial({color: 0xffff00, transparent: true, opacity: 0.2});
-        var ghost = new THREE.Mesh(ghostGeometry, ghostMaterial);
+        var ghost = rovObject.clone();
+        ghost.children[0].material = new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.2});
+        ghost.castShadow = false;
         ghost.matrix.setPosition(new THREE.Vector3(pose.x, pose.y, pose.z));
         ghost.setRotationFromEuler(new THREE.Euler(pose.roll, pose.pitch, pose.yaw));
         ghost.matrixAutoUpdate = false;
         scene.add(ghost);
-    }
+    };
 
+    // create a connecting line between two poses
+    this.drawConnection = function(startPose, targetPose) {
+        var lineMaterial = new THREE.LineBasicMaterial({color: 0xffff00});
+        var lineGeometry = new THREE.Geometry();
+        lineGeometry.vertices.push(new THREE.Vector3(startPose.x, startPose.y, startPose.z));
+        lineGeometry.vertices.push(new THREE.Vector3(targetPose.x, targetPose.y, targetPose.z));
+        var line = new THREE.Line(lineGeometry, lineMaterial);
+        scene.add(line);
+    };
+
+    // camera zoom in
     this.zoomIn = function() {
         zoom += 0.1;
         camera.zoom = zoom;
@@ -119,6 +150,7 @@ function NavMapVis() {
         renderer.render(scene, camera);
     };
 
+    // camera zoom out
     this.zoomOut = function() {
         zoom -= 0.1;
         camera.zoom = zoom;

@@ -1,5 +1,5 @@
 /**
- * Created by Sven on 02.01.2017.
+ * Created by Sven Otte on 02.01.2017.
  */
 function JSONLoader() {
     var navdata;
@@ -15,7 +15,7 @@ function JSONLoader() {
         };
 
         fr.readAsText(file);
-    }
+    };
 
     this.getNextDataSet = function() {
         dataSet = navdata[count];
@@ -26,7 +26,7 @@ function JSONLoader() {
             dataSet.pitch != undefined ? dataSet.pitch : null,
             dataSet.yaw != undefined ? dataSet.yaw : null,
             dataSet.thrust != undefined ? dataSet.thrust : null,
-            dataSet.depth != undefined ? dataSet.depth : null,
+            dataSet.deapth != undefined ? dataSet.deapth : null,
             dataSet.heading != undefined ? dataSet.heading : null,
             dataSet.acclx != undefined ? dataSet.acclx : null,
             dataSet.accly != undefined ? dataSet.accly : null,

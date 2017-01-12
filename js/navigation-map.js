@@ -4,6 +4,7 @@
 var jsonLoader;
 var navMapVis;
 var navMapCalc;
+var intervalId;
 
 $(document).ready(function () {
     jsonLoader = new JSONLoader();
@@ -71,9 +72,13 @@ function startTracking () {
     navMapCalc = new NavMapCalc();
     navMapVis.init("#renderer");
     navMapVis.animate();
+
+    intervalId = setInterval(nextTrackingStep, 100);
 }
 
 function stopTracking () {
+    clearInterval(intervalId);
+
     $("#start-tracking").html("Start tracking");
 
     $("#next-step-tracking").prop("disabled", true);
