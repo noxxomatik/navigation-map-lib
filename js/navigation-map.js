@@ -9,8 +9,6 @@ var realtimeTracking = true;
 var steppedTracking = false;
 
 $(document).ready(function () {
-    jsonLoader = new JSONLoader();
-
     $("#file-input").css("display", "none");
     $("#file-options").css("display", "none");
     $("#next-step-tracking").css("display", "none");
@@ -32,6 +30,7 @@ $(document).ready(function () {
     });
 
     $("#file-input").change(function () {
+        jsonLoader = new JSONLoader();
         jsonLoader.loadJSON($("#file-input").prop("files")[0]);
     });
     
@@ -85,10 +84,18 @@ function startTracking () {
 
     $("#next-step-tracking").prop("disabled", false);
 
+    // create the visualization
     navMapVis = new NavMapVis();
-    navMapCalc = new NavMapCalc();
+    // create the calculation with a selected GPS/INS integration method
+    navMapCalc = new NavMapCalc(new NoFilter());
+    // init the visualization
     navMapVis.init("#renderer");
     navMapVis.animate();
+
+    // calculate the first buoy position by the given coordinates
+    if($("#gps-calculation").prop("checked")) {
+        navMapVis.addBuoyPosition(navMapCalc.calculateNextBuoyPosition($("#lat").val(), $("#lon").val(), 1));
+    }
 
     if (realtimeTracking) {
         var navdata = new Navdata(0, 0, 0, 0, 0, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0, Date.now());
@@ -129,7 +136,7 @@ function startTracking () {
             $("#gravz").html(navdata.gravz);
             $("#timestamp").html(new Date(navdata.timestamp));
 
-            navMapVis.addROVPose(navMapCalc.calculateNextPose(navdata));
+            navMapCalc.calculateNextPose(navdata, navMapVis.addROVPose);
         }, true);
     }
     else if (!steppedTracking){
@@ -146,6 +153,8 @@ function stopTracking () {
     $("#next-step-tracking").prop("disabled", true);
 
     $("#renderer").empty();
+
+    // TODO: download buoy history
 
     $("#start-tracking").click(function () {
         startTracking();
@@ -182,7 +191,10 @@ function nextTrackingStep() {
     $("#gravz").html(navdata.gravz);
     $("#timestamp").html(new Date(navdata.timestamp));
 
-    navMapVis.addROVPose(navMapCalc.calculateNextPose(navdata));
+    var pose = navMapVis.addROVPose(navMapCalc.calculateNextPose(navdata));
+    if($("#gps-calculation").prop("checked")) {
+        navMapCalc.integrationMethod.calculateNextBuoyCoordinates(pose);
+    }
 }
 
 function zoomRenderer(e) {

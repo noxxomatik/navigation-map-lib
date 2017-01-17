@@ -71,12 +71,51 @@ function Navdata(roll, pitch, yaw, thrust, depth, heading, acclx, accly, acclz, 
     this.timestamp = timestamp
 }
 
-function NavMapCalc() {
+// buoy position
+function Buoy() {
+    this.coordinates = {
+        lat: null,
+        lon: null,
+        // accuracy of signal in meters
+        accuracy: null
+    };
+    this.position = {
+        x: null,
+        y: null,
+        // distance in m
+        distance: null,
+        // bearing in radians (counterclockwise from north)
+        bearing: null
+    };
+    this.clone = function() {
+        var buoy = new Buoy();
+        buoy.coordinates.lat = this.coordinates.lat;
+        buoy.coordinates.lon = this.coordinates.lon;
+        buoy.coordinates.accuracy = this.coordinates.accuracy;
+        buoy.position.x = this.position.x;
+        buoy.position.y = this.position.y;
+        buoy.position.distance = this.position.distance;
+        buoy.position.bearing = this.position.bearing;
+        return buoy;
+    }
+}
+
+function NavMapCalc(integrationMethod) {
+    this.integrationMethod = integrationMethod != undefined ? integrationMethod : new NoFilter(false, null, null);
+    this.calculateNextPose = this.integrationMethod.calculateNextPose;
+    this.calculateNextBuoyPosition = this.integrationMethod.calculateNextBuoyPosition;
+}
+
+/* filter for GPS/INS integration */
+// no filter (default)
+function NoFilter() {
     var pose = new Pose();
     var dataHistory = [];
+    var buoy = new Buoy();
+    var buoyHistory = [];
 
-    // calculate the next pose
-    this.calculateNextPose = function(navdata) {
+    // calculate the next pose from navdata
+    this.calculateNextPose = function(navdata, callback) {
         var newPose = new Pose();
 
         // first pose
@@ -103,7 +142,6 @@ function NavMapCalc() {
             newPose.timestamp = navdata.timestamp;
         }
         // calculate the next pose
-        // no filter
         else {
             // get last pose
             var oldPose = dataHistory[dataHistory.length - 1];
@@ -134,11 +172,52 @@ function NavMapCalc() {
         }
         // save in data history
         dataHistory.push(newPose.clone());
-        return newPose;
+
+        return newPose.clone();
     };
 
-    // returns pose of the ROV
-    this.getNextPose = function() {
-        return pose;
-    }
+    // calculates the next buoy position from coordinates
+    this.calculateNextBuoyPosition = function(lat, lon, accuracy, callback) {
+        // first position
+        if (buoyHistory.length < 1) {
+            buoy.coordinates.lat = parseFloat(lat);
+            buoy.coordinates.lon = parseFloat(lon);
+            buoy.coordinates.accuracy = parseFloat(accuracy);
+
+            buoy.position.x = 0;
+            buoy.position.y = 0;
+        }
+        else {
+            buoy.coordinates.lat = parseFloat(lat);
+            buoy.coordinates.lon = parseFloat(lon);
+            buoy.coordinates.accuracy = parseFloat(accuracy);
+
+            // get distance an bearing
+            var firstLatLon = new LatLon(buoyHistory[0].coordinates.lat, buoyHistory[0].coordinates.lon);
+            var newLatLon = new LatLon(parseFloat(lat), parseFloat(lon));
+            buoy.position.distance = firstLatLon.distanceTo(newLatLon);
+            buoy.position.bearing = firstLatLon.finalBearingTo(newLatLon) * (Math.PI / 180);
+        }
+        // save in history
+        buoyHistory.push(buoy.clone());
+
+        return buoy.clone();
+    };
+
+    // calculate the next virtual buoy coordinates from the ROV pose
+    this.calculateNextBuoyCoordinates = function(pose) {
+        var distance = Math.sqrt(Math.pow(pose.x, 2) + Math.pow(pose.y, 2));
+        var bearing = pose.yaw;
+        var firstLatLon = new LatLon(buoyHistory[0].coordinates.lat, buoyHistory[0].coordinates.lon);
+        var newLatLon = firstLatLon.destinationPoint(distance, bearing);
+        var buoy = new Buoy();
+        buoy.coordinates.lat = newLatLon.lat;
+        buoy.coordinates.lon = newLatLon.lon;
+        // save in history
+        buoyHistory.push(buoy.clone());
+    };
+
+    this.getBuoyHistory = function() {
+        return buoyHistory;
+    };
 }

@@ -13,6 +13,9 @@ function NavMapVis() {
     var rovMesh;
     var rovObject;
 
+    // buoy representation
+    var buoyObject;
+
     this.init = function(rendererSelector) {
         // scene dimensions
         var width = $(rendererSelector).width();
@@ -56,6 +59,9 @@ function NavMapVis() {
 
         // append renderer
         $(rendererSelector).append(renderer.domElement);
+
+        // append north
+        $(rendererSelector).append("<img src='res/north.svg' width='30px' style='position: absolute; top: 4px; right: 4px'/>");
     };
 
     this.animate = function() {
@@ -100,10 +106,48 @@ function NavMapVis() {
             var ghostPose = poseHistory[poseHistory.length - 2];
             this.createGhostROV(ghostPose);
             // draw a line to new pose
-            this.drawConnection(ghostPose, savePose);
+            this.drawConnection(ghostPose, savePose, new THREE.Color(1, 1, 0));
         }
 
         renderer.render(scene, camera);
+        return savePose.clone();
+    };
+
+    // adds the current buoy position to the scene
+    this.addBuoyPosition = function(buoy) {
+        // initialize the buoy
+        if (buoyHistory.length < 1) {
+            this.createBuoy(buoy);
+        }
+
+        // set the buoy to the new position
+        if (buoy.position.x != null && buoy.position.y != null) {
+            buoyObject.matrix.setPosition(new THREE.Vector3(buoy.position.x, buoy.position.y, 0.1));
+        }
+        // use bearing and distance
+        else {
+            buoyObject.setRotationFromEuler(new THREE.Euler(0, 0, buoy.position.bearing));
+            buoyObject.translateX(buoy.position.distance);
+            var position = buoyObject.getWorldPosition();
+            buoy.position.x = position.x;
+            buoy.position.y = position.y;
+        }
+
+        // save new position to history
+        var saveBuoy = buoy.clone();
+        buoyHistory.push(saveBuoy);
+
+        // create a ghost buoy at the last position
+        if (buoyHistory.length > 1) {
+            var ghostBuoy = buoyHistory[buoyHistory.length - 2];
+            this.createGhostBuoy(ghostBuoy);
+        }
+
+        if (typeof callback === "function") {
+            callback(saveBuoy.clone());
+        }
+        renderer.render(scene, camera);
+        return saveBuoy.clone();
     };
 
     // create the water surface
@@ -140,13 +184,33 @@ function NavMapVis() {
     };
 
     // create a connecting line between two poses
-    this.drawConnection = function(startPose, targetPose) {
-        var lineMaterial = new THREE.LineBasicMaterial({color: 0xffff00});
+    this.drawConnection = function(startPose, targetPose, color) {
+        var lineMaterial = new THREE.LineBasicMaterial({color: color.getHex()});
         var lineGeometry = new THREE.Geometry();
         lineGeometry.vertices.push(new THREE.Vector3(startPose.x, startPose.y, startPose.z));
         lineGeometry.vertices.push(new THREE.Vector3(targetPose.x, targetPose.y, targetPose.z));
         var line = new THREE.Line(lineGeometry, lineMaterial);
         scene.add(line);
+    };
+
+    // create the buoy representation
+    this.createBuoy = function(buoy){
+        var buoyMaterial = new THREE.MeshPhongMaterial({color: 0x00ff00, transparent: true, opacity: 0.5});
+        var buoyGeometry = new THREE.CircleBufferGeometry(buoy.coordinates.accuracy);
+        buoyObject = new THREE.Mesh(buoyGeometry, buoyMaterial);
+        buoyObject.castShadow = false;
+        buoyObject.matrixAutoUpdate = false;
+        scene.add(buoyObject);
+    };
+
+    // create a ghost buoy
+    this.createGhostBuoy = function(buoy){
+        var buoyMaterial = new THREE.MeshPhongMaterial({color: 0x00ff00, transparent: true, opacity: 0.2});
+        var buoyGeometry = new THREE.CircleBufferGeometry(buoy.coordinates.accuracy);
+        buoyObject = new THREE.Mesh(buoyGeometry, buoyMaterial);
+        buoyObject.castShadow = false;
+        buoyObject.matrixAutoUpdate = false;
+        scene.add(buoyObject);
     };
 
     // camera zoom in

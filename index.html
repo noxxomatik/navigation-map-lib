@@ -12,6 +12,7 @@
     <script src="js/OBJLoader.js"></script>
     <script src="js/latlon-ellipsoidal.js"></script>
     <script src="js/latlon-vincenty.js"></script>
+    <script src="js/vector3d.js"></script>
     <!-- navigation map library -->
     <script src="js/navigation-map.js"></script>
     <script src="js/navigation-map-visualization.js"></script>
@@ -28,11 +29,23 @@
             </select>
         </label>
         <input id="file-input" class="menu-item" type="file" accept=".json"/>
-        <label class="menu-item" id="file-options">
+        <label class="menu-item" id="options">
             Options:
-            <label class="menu-item">
+            <label class="menu-item" id="file-options">
             <input id="stepped-tracking" type="checkbox"/>
                 Break after every point
+            </label>
+            <label class="menu-item">
+                <input id="gps-calculation" type="checkbox"/>
+                Calculate GPS data from starting point
+                <label class="menu-item">
+                    lat:
+                    <input id="lat" value="51.037669" \>
+                </label>
+                <label class="menu-item">
+                    lon:
+                    <input id="lon" value="13.735245" \>
+                </label>
             </label>
         </label>
         <label class="menu-item">
