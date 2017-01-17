@@ -6,6 +6,7 @@ var navMapVis;
 var navMapCalc;
 var intervalId;
 var realtimeTracking = true;
+var steppedTracking = false;
 
 $(document).ready(function () {
     jsonLoader = new JSONLoader();
@@ -42,6 +43,19 @@ $(document).ready(function () {
         $("#next-step-tracking").prop("disabled", false);
     });
 
+    // option: stepped tracking for file source
+    $("#stepped-tracking").change(function() {
+       if ($("#stepped-tracking").prop("checked")) {
+           $("#next-step-tracking").prop("disabled", false);
+           steppedTracking = true;
+       }
+       else {
+           $("#next-step-tracking").prop("disabled", true);
+           steppedTracking = false;
+       }
+    });
+
+    // click on Next point
     $("#next-step-tracking").click(function () {
        nextTrackingStep();
     });
@@ -118,7 +132,8 @@ function startTracking () {
             navMapVis.addROVPose(navMapCalc.calculateNextPose(navdata));
         }, true);
     }
-    else {
+    else if (!steppedTracking){
+        // autoincrement the points
         intervalId = setInterval(nextTrackingStep, 100);
     }
 }
@@ -139,6 +154,10 @@ function stopTracking () {
 
 function nextTrackingStep() {
     navdata = jsonLoader.getNextDataSet();
+
+    if (navdata == null) {
+        return;
+    }
 
     $("#roll").html(navdata.roll);
     $("#pitch").html(navdata.pitch);

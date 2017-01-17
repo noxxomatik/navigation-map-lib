@@ -76,12 +76,7 @@ function NavMapCalc() {
     var dataHistory = [];
 
     // calculate the next pose
-    this.calculateNextPose = function(navdata, filter) {
-        /* mock values */
-        //navdata.lacclx = 1;
-        //navdata.laccly = 0;
-        //navdata.lacclz = 0;
-
+    this.calculateNextPose = function(navdata) {
         var newPose = new Pose();
 
         // first pose
@@ -91,8 +86,8 @@ function NavMapCalc() {
 
             // orientation
             newPose.roll = navdata.roll * (Math.PI / 180);
-            newPose.pitch = navdata.pitch * (Math.PI / 180);
-            newPose.yaw = navdata.yaw * (Math.PI / 180);
+            newPose.pitch = - (navdata.pitch * (Math.PI / 180));
+            newPose.yaw = - (navdata.yaw * (Math.PI / 180));      // clockwise
 
             // translation (not calculable because of missing time reference)
             newPose.transX = 0;
@@ -124,8 +119,8 @@ function NavMapCalc() {
 
             // orientation
             newPose.roll = navdata.roll * (Math.PI / 180);
-            newPose.pitch = navdata.pitch * (Math.PI / 180);
-            newPose.yaw = navdata.yaw * (Math.PI / 180);
+            newPose.pitch = - (navdata.pitch * (Math.PI / 180));
+            newPose.yaw = - (navdata.yaw * (Math.PI / 180));
 
             // translation ((a * Math.pow(t)) / 2 + vo * t)
             newPose.transX = (navdata.lacclx * Math.pow(t, 2)) / 2 + oldPose.veloX * t;

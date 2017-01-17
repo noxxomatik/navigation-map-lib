@@ -1,15 +1,19 @@
-/**
+/*
+ * Loader for downloaded OpenROV telemetry data.
+ *
  * Created by Sven Otte on 02.01.2017.
  */
 function JSONLoader() {
     var navdata;
-    var count = 0;
+    var count;
+    var length;
 
     this.loadJSON = function(file) {
         fr = new FileReader();
         fr.onload = function (e) {
             lines = e.target.result;
             navdata = (JSON.parse(lines))[0].data;
+            length = navdata.length;
             count = 0;
             console.log(navdata);
         };
@@ -18,6 +22,11 @@ function JSONLoader() {
     };
 
     this.getNextDataSet = function() {
+        // check if end of object is reached
+        if (count == length) {
+            return null;
+        }
+
         dataSet = navdata[count];
         count++;
 
@@ -46,7 +55,7 @@ function JSONLoader() {
             dataSet.timestamp != undefined ? dataSet.timestamp : null
         );
 
-        console.log("data set " + count + ": " + navdataSet);
+        console.log("data set " + count);
         return navdataSet;
     }
 }

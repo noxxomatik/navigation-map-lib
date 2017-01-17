@@ -80,6 +80,7 @@ function NavMapVis() {
 
         // save new position to history
         var position = rovObject.getWorldPosition();
+        console.log("position: x=" + position.x + ", y=" + position.y + ", z=" + position.z);
         var savePose = new Pose();
         savePose.x = position.x;
         savePose.y = position.y;
@@ -88,6 +89,11 @@ function NavMapVis() {
         savePose.pitch = pose.pitch;
         savePose.yaw = pose.yaw;
         poseHistory.push(savePose);
+
+        // camera follows the ROV
+        var cameraPosition = camera.getWorldPosition();
+        camera.matrix.setPosition(new THREE.Vector3(position.x - 50, position.y, cameraPosition.z));
+        camera.matrixAutoUpdate = false;
 
         // create a ghost pose of the last pose
         if (poseHistory.length > 1) {
@@ -123,12 +129,13 @@ function NavMapVis() {
 
     // create a ghost ROV pose
     this.createGhostROV = function(pose) {
-        var ghost = rovObject.clone();
-        ghost.children[0].material = new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.2});
+        var ghostMaterial = new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.2});
+        var ghost = new THREE.Mesh(rovMesh.geometry.clone(), ghostMaterial);
         ghost.castShadow = false;
-        ghost.matrix.setPosition(new THREE.Vector3(pose.x, pose.y, pose.z));
-        ghost.setRotationFromEuler(new THREE.Euler(pose.roll, pose.pitch, pose.yaw));
         ghost.matrixAutoUpdate = false;
+        ghost.setRotationFromEuler(new THREE.Euler(pose.roll, pose.pitch, pose.yaw));
+        ghost.updateMatrix();
+        ghost.matrix.setPosition(new THREE.Vector3(pose.x, pose.y, pose.z));
         scene.add(ghost);
     };
 
