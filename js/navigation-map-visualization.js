@@ -1,7 +1,7 @@
 /**
  * Created by Sven Otte on 02.01.2017.
  */
-function NavMapVis() {
+function NavMapVis(useOrientationMode) {
     var scene;
     var camera;
     var renderer;
@@ -15,6 +15,9 @@ function NavMapVis() {
 
     // buoy representation
     var buoyObject;
+
+    // orientation mode
+    var useOrientationMode = useOrientationMode;
 
     this.init = function(rendererSelector) {
         // scene dimensions
@@ -30,11 +33,20 @@ function NavMapVis() {
 
         // camera
         camera = new THREE.PerspectiveCamera(75, width / height, 1, 10000);
-        camera.position.z = 50;
-        camera.position.x = -50;
-        camera.rotation.z = - 1 / 2 * Math.PI;
-        camera.rotation.y =  - 1 / 4 * Math.PI;
-        //camera.lookAt(new THREE.Vector3(0, 0, 0));
+        if (!useOrientationMode) {
+            camera.position.z = 50;
+            camera.position.x = -50;
+            camera.rotation.z = - 1 / 2 * Math.PI;
+            camera.rotation.y =  - 1 / 4 * Math.PI;
+            //camera.lookAt(new THREE.Vector3(0, 0, 0));
+        }
+        else {
+            camera.position.x = -2;
+            camera.rotation.z = - 1 / 2 * Math.PI;
+            camera.rotation.y =  - 1 / 2 * Math.PI;
+        }
+
+
 
         // light
         var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
@@ -98,13 +110,20 @@ function NavMapVis() {
 
         // camera follows the ROV
         var cameraPosition = camera.getWorldPosition();
-        camera.matrix.setPosition(new THREE.Vector3(position.x - 50, position.y, cameraPosition.z));
+        if (!useOrientationMode) {
+            camera.matrix.setPosition(new THREE.Vector3(position.x - 50, position.y, cameraPosition.z));
+        }
+        else {
+            camera.matrix.setPosition(new THREE.Vector3(position.x - 2, position.y, position.z));
+        }
         camera.matrixAutoUpdate = false;
 
         // create a ghost pose of the last pose
         if (poseHistory.length > 1) {
             var ghostPose = poseHistory[poseHistory.length - 2];
-            this.createGhostROV(ghostPose);
+            if(!useOrientationMode){
+                this.createGhostROV(ghostPose);
+            }
             // draw a line to new pose
             this.drawConnection(ghostPose, savePose, new THREE.Color(1, 1, 0));
         }
@@ -122,7 +141,7 @@ function NavMapVis() {
 
         // set the buoy to the new position
         if (buoy.position.x != null && buoy.position.y != null) {
-            buoyObject.matrix.setPosition(new THREE.Vector3(buoy.position.x, buoy.position.y, 0.1));
+            buoyObject.matrix.setPosition(new THREE.Vector3(buoy.position.x, buoy.position.y, 0.01));
         }
         // use bearing and distance
         else {
@@ -163,12 +182,22 @@ function NavMapVis() {
     // create the ROV representation
     this.createROV = function() {
         var loader = new THREE.OBJLoader();
-        loader.load("models/rov.obj", function(object){
-            object.children[0].material = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
-            object.castShadow = false;
-            rovMesh = object.children[0];
-            rovObject = object;
-        });
+        //if (!useOrientationMode) {
+            loader.load("models/rov.obj", function (object) {
+                object.children[0].material = new THREE.MeshPhongMaterial({color: 0xff0000});
+                object.castShadow = false;
+                rovMesh = object.children[0];
+                rovObject = object;
+            });
+        //}
+        /*else {
+            loader.load("models/openrov.obj", function (object) {
+                object.children[0].material = new THREE.MeshPhongMaterial({color: 0xff0000});
+                object.castShadow = false;
+                rovMesh = object.children[0];
+                rovObject = object;
+            });
+        }*/
     };
 
     // create a ghost ROV pose
@@ -196,7 +225,7 @@ function NavMapVis() {
     // create the buoy representation
     this.createBuoy = function(buoy){
         var buoyMaterial = new THREE.MeshPhongMaterial({color: 0x00ff00, transparent: true, opacity: 0.5});
-        var buoyGeometry = new THREE.CircleBufferGeometry(buoy.coordinates.accuracy);
+        var buoyGeometry = new THREE.CircleBufferGeometry(buoy.coordinates.accuracy, 16);
         buoyObject = new THREE.Mesh(buoyGeometry, buoyMaterial);
         buoyObject.castShadow = false;
         buoyObject.matrixAutoUpdate = false;
@@ -206,7 +235,7 @@ function NavMapVis() {
     // create a ghost buoy
     this.createGhostBuoy = function(buoy){
         var buoyMaterial = new THREE.MeshPhongMaterial({color: 0x00ff00, transparent: true, opacity: 0.2});
-        var buoyGeometry = new THREE.CircleBufferGeometry(buoy.coordinates.accuracy);
+        var buoyGeometry = new THREE.CircleBufferGeometry(buoy.coordinates.accuracy, 16);
         buoyObject = new THREE.Mesh(buoyGeometry, buoyMaterial);
         buoyObject.castShadow = false;
         buoyObject.matrixAutoUpdate = false;

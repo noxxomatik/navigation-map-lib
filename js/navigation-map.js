@@ -85,7 +85,7 @@ function startTracking () {
     $("#next-step-tracking").prop("disabled", false);
 
     // create the visualization
-    navMapVis = new NavMapVis();
+    navMapVis = new NavMapVis(false);
     // create the calculation with a selected GPS/INS integration method
     navMapCalc = new NavMapCalc(new NoFilter());
     // init the visualization
