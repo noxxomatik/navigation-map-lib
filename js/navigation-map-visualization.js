@@ -27,30 +27,24 @@ function NavMapVis(useOrientationMode) {
 
         // scene
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(1, 1, 1);
-        this.createWater();
+        //scene.background = new THREE.Color(1, 1, 1);
+        //this.createWater();
         this.createROV();
 
         // camera
-        camera = new THREE.PerspectiveCamera(75, width / height, 1, 10000);
+        camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 10000);
         if (!useOrientationMode) {
-            camera.position.z = 50;
-            camera.position.x = -50;
-            camera.rotation.z = - 1 / 2 * Math.PI;
-            camera.rotation.y =  - 1 / 4 * Math.PI;
-            //camera.lookAt(new THREE.Vector3(0, 0, 0));
+            camera.position.z = 5;
+            camera.position.y = -5;
+            camera.rotation.x =  1 / 4 * Math.PI;
         }
         else {
-            camera.position.x = -2;
-            camera.rotation.z = - 1 / 2 * Math.PI;
-            camera.rotation.y =  - 1 / 2 * Math.PI;
+            camera.rotation.x =  1 / 2 * Math.PI;
         }
-
-
 
         // light
         var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-        directionalLight.position.set( 0, 1, 1 );
+        directionalLight.position.set( -1, 0, 2 ); // target by default is (0,0,0)
         scene.add( directionalLight );
 
         var light = new THREE.AmbientLight( 0x404040 ); // soft white light
@@ -65,8 +59,13 @@ function NavMapVis(useOrientationMode) {
         gridHelper.rotation.x = 1 / 2 * Math.PI;
         scene.add( gridHelper );
 
+        // axis helper
+        /*var axisHelper = new THREE.AxisHelper( 5 );
+        scene.add( axisHelper );*/
+
         // compilation
-        renderer = new THREE.WebGLRenderer();
+        renderer = new THREE.WebGLRenderer({alpha: true}); // transparent background
+        renderer.setClearColor( 0x000000, 0 );
         renderer.setSize(width, height);
 
         // append renderer
@@ -95,6 +94,7 @@ function NavMapVis(useOrientationMode) {
         rovObject.translateY(pose.transY);
         rovObject.translateZ(pose.transZ);
         //rovObject.matrixAutoUpdate = false;
+        //rovObject.updateMatrix();
 
         // save new position to history
         var position = rovObject.getWorldPosition();
@@ -111,10 +111,10 @@ function NavMapVis(useOrientationMode) {
         // camera follows the ROV
         var cameraPosition = camera.getWorldPosition();
         if (!useOrientationMode) {
-            camera.matrix.setPosition(new THREE.Vector3(position.x - 50, position.y, cameraPosition.z));
+            camera.matrix.setPosition(new THREE.Vector3(position.x, position.y - 5, position.z + 5));
         }
         else {
-            camera.matrix.setPosition(new THREE.Vector3(position.x - 2, position.y, position.z));
+            camera.matrix.setPosition(new THREE.Vector3(position.x, position.y - 5, position.z));
         }
         camera.matrixAutoUpdate = false;
 
@@ -182,22 +182,22 @@ function NavMapVis(useOrientationMode) {
     // create the ROV representation
     this.createROV = function() {
         var loader = new THREE.OBJLoader();
-        //if (!useOrientationMode) {
-            loader.load("models/rov.obj", function (object) {
+        if (!useOrientationMode) {
+            loader.load("models/dummyrov.obj", function (object) {
                 object.children[0].material = new THREE.MeshPhongMaterial({color: 0xff0000});
                 object.castShadow = false;
                 rovMesh = object.children[0];
                 rovObject = object;
             });
-        //}
-        /*else {
+        }
+        else {
             loader.load("models/openrov.obj", function (object) {
                 object.children[0].material = new THREE.MeshPhongMaterial({color: 0xff0000});
                 object.castShadow = false;
                 rovMesh = object.children[0];
                 rovObject = object;
             });
-        }*/
+        }
     };
 
     // create a ghost ROV pose

@@ -163,7 +163,7 @@ function NoFilter() {
             // translation ((a * Math.pow(t)) / 2 + vo * t)
             newPose.transX = (navdata.lacclx * Math.pow(t, 2)) / 2 + oldPose.veloX * t;
             newPose.transY = (navdata.laccly * Math.pow(t, 2)) / 2 + oldPose.veloY * t;
-            newPose.transZ = (navdata.lacclz * Math.pow(t, 2)) / 2 + oldPose.veloZ * t;
+            newPose.transZ = -((navdata.lacclz * Math.pow(t, 2)) / 2 + oldPose.veloZ * t); // z is facing down
 
             // velocity (a * t + v0)
             newPose.veloX = navdata.lacclx * t + oldPose.veloX;
