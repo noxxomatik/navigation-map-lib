@@ -62,7 +62,6 @@ $(document).ready(function () {
            orientationMode = true;
        }
        else {
-           $("#next-step-tracking").prop("disabled", true);
            orientationMode = false;
        }
     });
