@@ -1,5 +1,6 @@
 /**
- * Created by Sven Otte on 02.01.2017.
+ * Test page for the navigation-map-lib framework.
+ * @author Sven Otte
  */
 var jsonLoader;
 var navMapVis;
@@ -7,6 +8,7 @@ var navMapCalc;
 var intervalId;
 var realtimeTracking = true;
 var steppedTracking = false;
+var orientationMode = false;
 
 $(document).ready(function () {
     $("#file-input").css("display", "none");
@@ -54,6 +56,17 @@ $(document).ready(function () {
        }
     });
 
+    // option: orientation mode
+    $("#orientation-mode").change(function() {
+       if ($("#orientation-mode").prop("checked")) {
+           orientationMode = true;
+       }
+       else {
+           $("#next-step-tracking").prop("disabled", true);
+           orientationMode = false;
+       }
+    });
+
     // click on Next point
     $("#next-step-tracking").click(function () {
        nextTrackingStep();
@@ -85,12 +98,11 @@ function startTracking () {
     $("#next-step-tracking").prop("disabled", false);
 
     // create the visualization
-    navMapVis = new NavMapVis(true);
+    navMapVis = new NavMapVis(orientationMode);
     // create the calculation with a selected GPS/INS integration method
     navMapCalc = new NavMapCalc(new NoFilter());
     // init the visualization
     navMapVis.init("#renderer");
-    navMapVis.animate();
 
     // calculate the first buoy position by the given coordinates
     if($("#gps-calculation").prop("checked")) {
@@ -118,7 +130,7 @@ function startTracking () {
             $("#yaw").html(navdata.yaw);
             $("#thrust").html(navdata.thrust);
             $("#depth").html(navdata.depth);
-            $("#heading").html(navdata.heading);
+            $("#heading").html(navdata.hdgd);
             $("#acclx").html(navdata.acclx);
             $("#accly").html(navdata.accly);
             $("#acclz").html(navdata.acclz);
@@ -173,7 +185,7 @@ function nextTrackingStep() {
     $("#yaw").html(navdata.yaw);
     $("#thrust").html(navdata.thrust);
     $("#depth").html(navdata.depth);
-    $("#heading").html(navdata.heading);
+    $("#heading").html(navdata.hdgd);
     $("#acclx").html(navdata.acclx);
     $("#accly").html(navdata.accly);
     $("#acclz").html(navdata.acclz);

@@ -16,7 +16,8 @@ function NavMapVis(useOrientationMode) {
     var renderer;
     var poseHistory = [];
     var buoyHistory = [];
-    var zoom = 1;
+    var cameraDistance = 5;
+    var renderFunction;
 
     // ROV representation
     var rovMesh;
@@ -47,8 +48,8 @@ function NavMapVis(useOrientationMode) {
         // camera
         camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 10000);
         if (!useOrientationMode) {
-            camera.position.z = 5;
-            camera.position.y = -5;
+            camera.position.z = cameraDistance;
+            camera.position.y = -cameraDistance;
             camera.rotation.x =  1 / 4 * Math.PI;
         }
         else {
@@ -86,12 +87,31 @@ function NavMapVis(useOrientationMode) {
 
         // append north
         $(rendererSelector).append("<img src='res/north.svg' width='30px' style='position: absolute; top: 4px; right: 4px'/>");
+
+        renderFunction = this.render;
+        this.render();
     };
 
     /**
-     * Update the renderer.
+     * Start render loop.
+     * @private
      */
-    this.animate = function() {
+    this.render = function() {
+        requestAnimationFrame( renderFunction );
+
+        // camera follows the ROV
+        if (rovObject != undefined) {
+            var position = rovObject.getWorldPosition();
+            if (!useOrientationMode) {
+                camera.matrix.setPosition(new THREE.Vector3(position.x, position.y - cameraDistance, position.z + cameraDistance));
+            }
+            else {
+                camera.matrix.setPosition(new THREE.Vector3(position.x, position.y - cameraDistance, position.z));
+            }
+            camera.matrixAutoUpdate = false;
+            camera.getWorldPosition(); // updates the camera position (updateMatrix doesn't work)
+        }
+
         renderer.render(scene, camera);
     };
 
@@ -113,8 +133,7 @@ function NavMapVis(useOrientationMode) {
         rovObject.translateX(pose.transX);
         rovObject.translateY(pose.transY);
         rovObject.translateZ(pose.transZ);
-        //rovObject.matrixAutoUpdate = false;
-        //rovObject.updateMatrix();
+        rovObject.updateMatrix();
 
         // save new position to history
         var position = rovObject.getWorldPosition();
@@ -128,16 +147,6 @@ function NavMapVis(useOrientationMode) {
         savePose.yaw = pose.yaw;
         poseHistory.push(savePose);
 
-        // camera follows the ROV
-        var cameraPosition = camera.getWorldPosition();
-        if (!useOrientationMode) {
-            camera.matrix.setPosition(new THREE.Vector3(position.x, position.y - 5, position.z + 5));
-        }
-        else {
-            camera.matrix.setPosition(new THREE.Vector3(position.x, position.y - 5, position.z));
-        }
-        camera.matrixAutoUpdate = false;
-
         // create a ghost pose of the last pose
         if (poseHistory.length > 1) {
             var ghostPose = poseHistory[poseHistory.length - 2];
@@ -148,7 +157,6 @@ function NavMapVis(useOrientationMode) {
             this.drawConnection(ghostPose, savePose, new THREE.Color(1, 1, 0));
         }
 
-        renderer.render(scene, camera);
         return savePose.clone();
     };
 
@@ -188,7 +196,6 @@ function NavMapVis(useOrientationMode) {
         if (typeof callback === "function") {
             callback(saveBuoy.clone());
         }
-        renderer.render(scene, camera);
         return saveBuoy.clone();
     };
 
@@ -290,19 +297,13 @@ function NavMapVis(useOrientationMode) {
      * Lets the camera zoom into the map.
      */
     this.zoomIn = function() {
-        zoom += 0.1;
-        camera.zoom = zoom;
-        camera.updateProjectionMatrix();
-        renderer.render(scene, camera);
+        cameraDistance -= 0.1;
     };
 
     /**
      * Lets the camera zoom out of the map.
      */
     this.zoomOut = function() {
-        zoom -= 0.1;
-        camera.zoom = zoom;
-        camera.updateProjectionMatrix();
-        renderer.render(scene, camera);
+        cameraDistance += 0.1;
     };
 }

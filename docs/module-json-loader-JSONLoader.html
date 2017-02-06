@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: NavMapCalc</title>
+    <title>JSDoc: Class: JSONLoader</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: NavMapCalc</h1>
+    <h1 class="page-title">Class: JSONLoader</h1>
 
     
 
@@ -29,7 +29,7 @@
 <header>
     
         <h2>
-            <span class="ancestors"><a href="module-navigation-map-calculation.html">navigation-map-calculation</a>~</span>NavMapCalc</h2>
+            <span class="ancestors"><a href="module-json-loader.html">json-loader</a>~</span>JSONLoader</h2>
         
     
 </header>
@@ -41,14 +41,214 @@
 
     
 
-    <h4 class="name" id="NavMapCalc"><span class="type-signature"></span>new NavMapCalc<span class="signature">(integrationMethod)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="JSONLoader"><span class="type-signature"></span>new JSONLoader<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Gathers all available sensor data and calculates the pose of the ROV.
+    Loader for downloaded OpenROV telemetry data.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="json-loader.js.html">json-loader.js</a>, <a href="json-loader.js.html#line11">line 11</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="getNextDataSet"><span class="type-signature"></span>getNextDataSet<span class="signature">()</span><span class="type-signature"> &rarr; {Navdata}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Returns the next set of navdata.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="json-loader.js.html">json-loader.js</a>, <a href="json-loader.js.html#line37">line 37</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Navdata</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="loadJSON"><span class="type-signature"></span>loadJSON<span class="signature">(file)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Loads a JSON-file.
 </div>
 
 
@@ -84,10 +284,15 @@
 
         <tr>
             
-                <td class="name"><code>integrationMethod</code></td>
+                <td class="name"><code>file</code></td>
             
 
             <td class="type">
+            
+                
+<span class="param-type">File</span>
+
+
             
             </td>
 
@@ -95,7 +300,7 @@
 
             
 
-            <td class="description last">The chosen integration method to calculate the pose.</td>
+            <td class="description last">The JSON-file.</td>
         </tr>
 
     
@@ -136,7 +341,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="navigation-map-calculation.js.html">navigation-map-calculation.js</a>, <a href="navigation-map-calculation.js.html#line162">line 162</a>
+        <a href="json-loader.js.html">json-loader.js</a>, <a href="json-loader.js.html#line20">line 20</a>
     </li></ul></dd>
     
 
@@ -162,211 +367,7 @@
 
 
 
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-        <h3 class="subsection-title">Members</h3>
-
         
-            
-<h4 class="name" id="calculateNextBuoyPosition"><span class="type-signature"></span>calculateNextBuoyPosition<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Calculates the next buoy position.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="navigation-map-calculation.js.html">navigation-map-calculation.js</a>, <a href="navigation-map-calculation.js.html#line174">line 174</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="calculateNextPose"><span class="type-signature"></span>calculateNextPose<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Calculates the next ROV pose.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="navigation-map-calculation.js.html">navigation-map-calculation.js</a>, <a href="navigation-map-calculation.js.html#line170">line 170</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="integrationMethod"><span class="type-signature"></span>integrationMethod<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    The chosen integration method. Default is NoFilter.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="navigation-map-calculation.js.html">navigation-map-calculation.js</a>, <a href="navigation-map-calculation.js.html#line166">line 166</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-    
-
     
 
     

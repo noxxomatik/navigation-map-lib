@@ -68,7 +68,7 @@ function Pose() {
  * @param yaw
  * @param thrust
  * @param depth
- * @param heading
+ * @param hdgd
  * @param acclx
  * @param accly
  * @param acclz
@@ -87,13 +87,13 @@ function Pose() {
  * @param timestamp
  * @constructor
  */
-function Navdata(roll, pitch, yaw, thrust, depth, heading, acclx, accly, acclz, magx, magy, magz, gyrox, gyroy, gyroz, lacclx, laccly, lacclz, gravx, gravy, gravz, timestamp) {
+function Navdata(roll, pitch, yaw, thrust, depth, hdgd, acclx, accly, acclz, magx, magy, magz, gyrox, gyroy, gyroz, lacclx, laccly, lacclz, gravx, gravy, gravz, timestamp) {
     this.roll = roll;
     this.pitch = pitch;
     this.yaw = yaw;
     this.thrust = thrust;
     this.depth = depth;
-    this.heading = heading;
+    this.hdgd = hdgd;
     this.acclx = acclx;
     this.accly = accly;
     this.acclz = acclz;
