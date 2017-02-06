@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: NavMapCalc</title>
+    <title>JSDoc: Class: Buoy</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: NavMapCalc</h1>
+    <h1 class="page-title">Class: Buoy</h1>
 
     
 
@@ -29,7 +29,7 @@
 <header>
     
         <h2>
-            <span class="ancestors"><a href="module-navigation-map-calculation.html">navigation-map-calculation</a>~</span>NavMapCalc</h2>
+            <span class="ancestors"><a href="module-navigation-map-calculation.html">navigation-map-calculation</a>~</span>Buoy</h2>
         
     
 </header>
@@ -41,14 +41,14 @@
 
     
 
-    <h4 class="name" id="NavMapCalc"><span class="type-signature"></span>new NavMapCalc<span class="signature">(integrationMethod)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Buoy"><span class="type-signature"></span>new Buoy<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Gathers all available sensor data and calculates the pose of the ROV.
+    This object represents the calculated or measured buoy position.
 </div>
 
 
@@ -57,50 +57,6 @@
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>integrationMethod</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The chosen integration method to calculate the pose.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -136,7 +92,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="navigation-map-calculation.js.html">navigation-map-calculation.js</a>, <a href="navigation-map-calculation.js.html#line162">line 162</a>
+        <a href="navigation-map-calculation.js.html">navigation-map-calculation.js</a>, <a href="navigation-map-calculation.js.html#line119">line 119</a>
     </li></ul></dd>
     
 
@@ -180,13 +136,13 @@
 
         
             
-<h4 class="name" id="calculateNextBuoyPosition"><span class="type-signature"></span>calculateNextBuoyPosition<span class="type-signature"></span></h4>
+<h4 class="name" id="coordinates"><span class="type-signature"></span>coordinates<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    Calculates the next buoy position.
+    The coordinates of the buoy in latitude and longitude.
 </div>
 
 
@@ -224,7 +180,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="navigation-map-calculation.js.html">navigation-map-calculation.js</a>, <a href="navigation-map-calculation.js.html#line174">line 174</a>
+        <a href="navigation-map-calculation.js.html">navigation-map-calculation.js</a>, <a href="navigation-map-calculation.js.html#line123">line 123</a>
     </li></ul></dd>
     
 
@@ -242,13 +198,13 @@
 
         
             
-<h4 class="name" id="calculateNextPose"><span class="type-signature"></span>calculateNextPose<span class="type-signature"></span></h4>
+<h4 class="name" id="position"><span class="type-signature"></span>position<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    Calculates the next ROV pose.
+    The position of the buoy in the visualisation.
 </div>
 
 
@@ -286,7 +242,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="navigation-map-calculation.js.html">navigation-map-calculation.js</a>, <a href="navigation-map-calculation.js.html#line170">line 170</a>
+        <a href="navigation-map-calculation.js.html">navigation-map-calculation.js</a>, <a href="navigation-map-calculation.js.html#line132">line 132</a>
     </li></ul></dd>
     
 
@@ -301,17 +257,33 @@
 
 
 
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
 
         
             
-<h4 class="name" id="integrationMethod"><span class="type-signature"></span>integrationMethod<span class="type-signature"></span></h4>
 
+    
+
+    <h4 class="name" id="clone"><span class="type-signature"></span>clone<span class="signature">()</span><span class="type-signature"> &rarr; {Buoy}</span></h4>
+
+    
 
 
 
 <div class="description">
-    The chosen integration method. Default is NoFilter.
+    Clones the object.
 </div>
+
+
+
+
+
+
 
 
 
@@ -348,7 +320,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="navigation-map-calculation.js.html">navigation-map-calculation.js</a>, <a href="navigation-map-calculation.js.html#line166">line 166</a>
+        <a href="navigation-map-calculation.js.html">navigation-map-calculation.js</a>, <a href="navigation-map-calculation.js.html#line144">line 144</a>
     </li></ul></dd>
     
 
@@ -364,9 +336,39 @@
 
 
 
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
         
+<div class="param-desc">
+    Cloned buoy object.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Buoy</span>
+
+
+    </dd>
+</dl>
+
     
 
+
+
+        
     
 
     
@@ -388,7 +390,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Feb 06 2017 14:42:31 GMT+0100 (Mitteleuropäische Zeit)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Feb 06 2017 14:46:35 GMT+0100 (Mitteleuropäische Zeit)
 </footer>
 
 <script> prettyPrint(); </script>
